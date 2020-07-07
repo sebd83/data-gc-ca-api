@@ -72,12 +72,12 @@ def main():
         sys.exit(1)
     if options.list:
         for cityname in cityindex.english_city_list():
-            print cityname
+            print(cityname)
         sys.exit(1)
 
 
     if not options.city:
-        print "No City given, using, Victoria, BC (the best city)."
+        print("No City given, using, Victoria, BC (the best city).")
     else:
         city = options.city
 
@@ -90,15 +90,15 @@ def main():
     if cityindex.is_city(city):
         cityObject = City(cityindex.data_url(city))
         if not options.quantity:
-            print "No requested quantity given, using temperature"
-            print quantity + " is: " + cityObject.get_quantity(quantity)
+            print("No requested quantity given, using temperature")
+            print(quantity + " is: " + cityObject.get_quantity(quantity))
     else:
-        print city + " is not available"
+        print(city + " is not available")
         bestGuess = get_best_guess(city,cityindex.english_city_list())
         if bestGuess:
-           print "Did you mean: " + bestGuess
+           print("Did you mean: " + bestGuess)
         else:
-           print "Do 'weatherca --list' to get a list of cities"
+           print("Do 'weatherca --list' to get a list of cities")
 
 
     # the following prints out all the available xpaths for testing purposes
@@ -113,7 +113,7 @@ def main():
 #        else:
 #            print xpath['path']
 #        #print xpath[0] 
-        print xpath
+        print(xpath)
 
 
 #    for forecastname in cityObject.getAvailableForecastNames():

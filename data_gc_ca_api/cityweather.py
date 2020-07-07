@@ -6,7 +6,7 @@
 
 ## Auth.: Ian Gable
 
-import urllib
+import requests
 import sys
 
 
@@ -15,9 +15,9 @@ import sys
 # of this includes this already.
 
 if float(sys.version[:3]) >= 2.7:
-    from xml.etree.ElementTree import ElementTree
+    from xml.etree.ElementTree import ElementTree, fromstring
 else:
-    from elementtree.ElementTree import ElementTree
+    from elementtree.ElementTree import ElementTree, fromstring
 
 class CityIndex:
     def __init__(self):
@@ -29,20 +29,21 @@ class CityIndex:
         cityListTree = ElementTree()
 
         try:
-            urlhandle = urllib.urlopen(self.city_list_url)
+            urlhandle = requests.get(self.city_list_url)
         except IOError:
             raise  IOError("Unable to open the data url: " + self.city_list_url)
 
-        cityListTree.parse(urlhandle)
-        siteList = cityListTree.findall("site")
+        if urlhandle.status_code == 200:
+            cityListTree = ElementTree(fromstring(urlhandle.text))
+            siteList = cityListTree.findall("site")
 
-        for site in siteList:
-            cityNameEnglish = site.findtext("nameEn").encode('utf-8')
-            
-            self.cities[cityNameEnglish] = {\
-                    'sitecode': site.attrib['code'].encode('utf-8'),\
-                    'provincecode': site.findtext("provinceCode").encode('utf-8'),\
-                    'nameFr': site.findtext("nameFr").encode('utf-8') }
+            for site in siteList:
+                cityNameEnglish = site.findtext("nameEn")#.encode('utf-8')
+                
+                self.cities[cityNameEnglish] = {\
+                        'sitecode': site.attrib['code'],\
+                        'provincecode': site.findtext("provinceCode"),\
+                        'nameFr': site.findtext("nameFr") }
 
             
     def is_city(self, name):
@@ -85,7 +86,7 @@ class CityIndex:
         return self.cities.keys()
 
     def french_city_list(self):
-        return [v['nameFr'] for k, v in self.cities.iteritems()]
+        return [v['nameFr'] for k, v in self.cities.items()]
 
 
 class City():
@@ -97,12 +98,13 @@ class City():
         self.tree = ElementTree()
 
         try:
-            urlhandle = urllib.urlopen(dataurl)
+            urlhandle = requests.get(dataurl)
         except IOError:
-            print "[Error] Unable to open the data url: " + dataurl
+            print("[Error] Unable to open the data url: " + dataurl)
             sys.exit(1)
 
-        self.tree.parse(urlhandle)
+        if urlhandle.status_code == 200:
+            self.tree = ElementTree(fromstring(urlhandle.text))
 
     def get_quantity(self,path):
         """Get the quatity contained at the XML XPath"""
@@ -143,7 +145,7 @@ class City():
 
     def _make_attribute_list(self, attrib):
         xpathattrib = ""
-        for attribute, value in attrib.iteritems():
+        for attribute, value in attrib.items():
             xpathattrib = xpathattrib + "[@" + attribute + "='" + value + "']"
         return xpathattrib
 
