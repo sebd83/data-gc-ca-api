@@ -188,10 +188,12 @@ class City():
     # This function will break is thre is any change in the city weather
     # XML format
     def get_available_forecast_periods(self):
-        forecasts = self.tree.findall('forecastGroup/forecast/period')
+        forecasts = self.tree.findall('forecastGroup/forecast')
         forecastnames = []
         for forecast in forecasts:
-            forecastnames.append(forecast.text)
+            #print(forecast.items())
+            for k in forecast.iter():
+                if k.tag != "forecast":
+                    kval = "".join(k.itertext())
+                    forecastnames.append(f"{k.tag}: {kval}")
         return forecastnames
-
-

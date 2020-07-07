@@ -61,6 +61,9 @@ def main():
     parser.add_option("-a", "--list-quantities", action="store_true", dest="list_quantities",
                                             help="Show a list of the available quantities")
 
+    parser.add_option("-f", "--list-forecast-periods", action="store_true", dest="list_forecasts",
+                                            help="Show a list of the available forecast periods")
+
 
     (options, args) = parser.parse_args()
 
@@ -75,6 +78,12 @@ def main():
 
     if options.list_quantities and options.list:
         parser.error("Can't use -l and -a at the same time")
+        sys.exit(1)
+    if options.list_forecasts and options.list:
+        parser.error("Can't use -l and -f at the same time")
+        sys.exit(1)
+    if options.list_forecasts and options.list_quantities:
+        parser.error("Can't use -a and -f at the same time")
         sys.exit(1)
     if options.city and options.list:
         parser.error("Can't use -c and -l at the same time")
@@ -103,11 +112,25 @@ def main():
         cityObject = City(cityindex.data_url(city))
         if options.list_quantities:
             for q in cityObject.get_available_quantities():
+<<<<<<< Updated upstream
                 print q
         else:
             if not options.quantity:
                 print "No requested quantity given, using temperature"
             print quantity + " is: " + cityObject.get_quantity(quantity)
+=======
+                print(q)
+        elif options.list_forecasts:
+            for fn in cityObject.get_available_forecast_names():
+                print(fn)
+        else:
+            if not options.quantity:
+                print("No requested quantity given, showing forecasts")
+                for fc in cityObject.get_available_forecast_periods():
+                    print(fc)
+            else:
+                print(quantity + " is: " + cityObject.get_quantity(quantity))
+>>>>>>> Stashed changes
     else:
         print city + " is not available"
         bestGuess = get_best_guess(city,cityindex.english_city_list())
