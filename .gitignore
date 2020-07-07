@@ -6,5 +6,6 @@
 .nfs*
 build/
 dist/
+env/
 MANIFEST
 *.egg-info
